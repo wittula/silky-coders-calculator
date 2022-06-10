@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Simple Temperature Calculator</title>
+  </head>
+
+  <body>
+  	<div class="window errors">
+      <ul>
+        <li><%= error.msg %></li>
+      </ul>
+    </div>
+
+    <div class="windows--container">
+      <!-- Main calculator window -->
+      <div class="main--container">
+        <header class="header">
+          <h1>Temperature calculator</h1>
+        </header>
+
+        <main class="window main">
+          <div class="result">
+            <span>10°C = 10°C</span>
+          </div>
+
+          <form action="" class="form" method="POST">
+            <div class="form--value">
+              <label for="value">Value to convert:</label>
+              <input
+                type="number"
+                id="value"
+                name="value"
+                placeholder="e.g. 60"
+              />
+            </div>
+
+            <div class="form--temperatures">
+              <label for="tempFrom">From:</label>
+              <select name="tempFrom" id="tempFrom">
+                <option value="c">°C</option>
+                <option value="f">°F</option>
+                <option value="k">K</option>
+              </select>
+
+              <label for="tempTo">To:</label>
+              <select name="tempTo" id="tempTo">
+                <option value="c">°C</option>
+                <option value="f" selected>°F</option>
+                <option value="k">K</option>
+              </select>
+            </div>
+
+            <button type="submit">Calculate</button>
+          </form>
+          <button class="close--button" id="historyClockButton">
+            <span id="historyButtonText">Show history </span>
+            <i class="fa-solid fa-clock-rotate-left"></i>
+          </button>
+        </main>
+      </div>
+
+      <!-- Calculator history window - hidden by default  -->
+      <section class="window history visuallyhidden" id="historyWindow">
+        <div class="history--table">
+          <table>
+            <thead>
+              <tr>
+                <th>Input</th>
+                <th>Output</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>10°C</td>
+                <td>10°C</td>
+                <td>08.06.2022 22:19</td>
+              </tr>
+
+            </tbody>
+          </table>
+
+          <button class="close--button" id="historyCloseButton">
+            <span>CLOSE </span>
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <footer class="footer">
+      <a href="https://github.com/wittula"
+        ><i class="fab fa-github"></i> Patryk 'wittula' Wittbrodt</a
+      >
+    </footer>
+
+    <script src="client.js"></script>
+    
+    <!-- Font Awesome -->
+    <script
+      src="https://kit.fontawesome.com/50b3ee0297.js"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
