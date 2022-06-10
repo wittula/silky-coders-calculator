@@ -15,7 +15,7 @@
   </head>
 
   <body>
-  	<div class="window errors">
+    <div class="window errors">
       <ul>
         <li><%= error.msg %></li>
       </ul>
@@ -30,10 +30,10 @@
 
         <main class="window main">
           <div class="result">
-            <span>10°C = 10°C</span>
+            <span id="calculatorOutput">10°C = 10°C</span>
           </div>
 
-          <form action="" class="form" method="POST">
+          <form onsubmit="return handleSubmit(event)">
             <div class="form--value">
               <label for="value">Value to convert:</label>
               <input
@@ -63,7 +63,7 @@
             <button type="submit">Calculate</button>
           </form>
           <button class="close--button" id="historyClockButton">
-            <span id="historyButtonText">Show history </span>
+            <span id="historyButtonText">Show history </span>
             <i class="fa-solid fa-clock-rotate-left"></i>
           </button>
         </main>
@@ -87,12 +87,11 @@
                 <td>10°C</td>
                 <td>08.06.2022 22:19</td>
               </tr>
-
             </tbody>
           </table>
 
           <button class="close--button" id="historyCloseButton">
-            <span>CLOSE </span>
+            <span>CLOSE </span>
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -101,16 +100,57 @@
 
     <footer class="footer">
       <a href="https://github.com/wittula"
-        ><i class="fab fa-github"></i> Patryk 'wittula' Wittbrodt</a
+        ><i class="fab fa-github"></i> Patryk 'wittula' Wittbrodt</a
       >
     </footer>
 
     <script src="client.js"></script>
-    
+
     <!-- Font Awesome -->
     <script
       src="https://kit.fontawesome.com/50b3ee0297.js"
       crossorigin="anonymous"
     ></script>
+    <script>
+      const el = document.getElementById("calculatorOutput");
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        console.log(e);
+        const value = e.target[0].value;
+        const tempFrom = e.target[1].value;
+        const tempTo = e.target[2].value;
+
+        // console.log(value, tempFrom, tempTo);
+
+        const data = {
+          value: value,
+          tempFrom: tempFrom,
+          tempTo: tempTo,
+        };
+
+        const postData = async (data, el) => {
+          fetch("api/calc", {
+            method: "POST",
+            mode: "same-origin", // no-cors, *cors, same-origin
+            cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: "same-origin", // include, *same-origin, omit
+            redirect: "follow", // manual, *follow, error
+            referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade,
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          })
+            .then((response) => response.json())
+            .then(
+              (data) =>
+                (el.innerHTML = data.inputString + " = " + data.outputString)
+            );
+        };
+        postData(data, el).then((data) => {
+          console.log(data);
+        });
+      };
+    </script>
   </body>
 </html>
