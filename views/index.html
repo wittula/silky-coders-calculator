@@ -15,10 +15,8 @@
   </head>
 
   <body>
-    <div class="window errors">
-      <ul>
-        <li><%= error.msg %></li>
-      </ul>
+    <div class="window errors visuallyhidden" id="errorDiv">
+      <ul id="errorWrapper"></ul>
     </div>
 
     <div class="windows--container">
@@ -30,7 +28,7 @@
 
         <main class="window main">
           <div class="result">
-            <span id="calculatorOutput">10°C = 10°C</span>
+            <span id="calculatorOutput"></span>
           </div>
 
           <form onsubmit="return handleSubmit(event)">
@@ -77,17 +75,11 @@
               <tr>
                 <th>Input</th>
                 <th>Output</th>
-                <th>Date</th>
+                <th>Date (UTC)</th>
               </tr>
             </thead>
 
-            <tbody>
-              <tr>
-                <td>10°C</td>
-                <td>10°C</td>
-                <td>08.06.2022 22:19</td>
-              </tr>
-            </tbody>
+            <tbody id="tableBody"></tbody>
           </table>
 
           <button class="close--button" id="historyCloseButton">
@@ -111,46 +103,5 @@
       src="https://kit.fontawesome.com/50b3ee0297.js"
       crossorigin="anonymous"
     ></script>
-    <script>
-      const el = document.getElementById("calculatorOutput");
-      const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log(e);
-        const value = e.target[0].value;
-        const tempFrom = e.target[1].value;
-        const tempTo = e.target[2].value;
-
-        // console.log(value, tempFrom, tempTo);
-
-        const data = {
-          value: value,
-          tempFrom: tempFrom,
-          tempTo: tempTo,
-        };
-
-        const postData = async (data, el) => {
-          fetch("api/calc", {
-            method: "POST",
-            mode: "same-origin", // no-cors, *cors, same-origin
-            cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-            credentials: "same-origin", // include, *same-origin, omit
-            redirect: "follow", // manual, *follow, error
-            referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade,
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-          })
-            .then((response) => response.json())
-            .then(
-              (data) =>
-                (el.innerHTML = data.inputString + " = " + data.outputString)
-            );
-        };
-        postData(data, el).then((data) => {
-          console.log(data);
-        });
-      };
-    </script>
   </body>
 </html>
