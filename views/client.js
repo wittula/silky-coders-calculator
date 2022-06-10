@@ -15,11 +15,5 @@ function switchHistoryWindow() {
   }
 }
 
-historyWindow.addEventListener("transitionend", function () {
-  if (isHidden()) {
-    historyWindow.style.display = "none";
-  }
-});
-
 historyClockButton.addEventListener("click", switchHistoryWindow);
 historyCloseButton.addEventListener("click", switchHistoryWindow);
