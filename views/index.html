@@ -15,15 +15,9 @@
   </head>
 
   <body>
-    <% if(typeof alert != 'undefined') { %>
-    <div class="window errors">
-      <ul>
-        <% alert.forEach(function(error) { %>
-        <li><%= error.msg %></li>
-        <% }) %>
-      </ul>
+    <div class="window errors visuallyhidden" id="errorDiv">
+      <ul id="errorWrapper"></ul>
     </div>
-    <% } %>
 
     <div class="windows--container">
       <!-- Main calculator window -->
@@ -34,19 +28,16 @@
 
         <main class="window main">
           <div class="result">
-            <% if(typeof inputString != 'undefined') { %>
-            <span> <%= inputString %> = <%= outputString %></span>
-            <% } %>
+            <span id="calculatorOutput"></span>
           </div>
 
-          <form action="/" class="form" method="POST">
+          <form onsubmit="return handleSubmit(event)">
             <div class="form--value">
-              <label for="inputValue">Value to convert:</label>
+              <label for="value">Value to convert:</label>
               <input
                 type="number"
-                id="inputValue"
-                name="inputValue"
-                step="0.01"
+                id="value"
+                name="value"
                 placeholder="e.g. 60"
               />
             </div>
@@ -70,7 +61,7 @@
             <button type="submit">Calculate</button>
           </form>
           <button class="close--button" id="historyClockButton">
-            <span id="historyButtonText">Show history </span>
+            <span id="historyButtonText">Show history </span>
             <i class="fa-solid fa-clock-rotate-left"></i>
           </button>
         </main>
@@ -84,21 +75,15 @@
               <tr>
                 <th>Input</th>
                 <th>Output</th>
-                <th>Date</th>
+                <th>Date (UTC)</th>
               </tr>
             </thead>
 
-            <tbody>
-              <tr>
-                <td>10°C</td>
-                <td>10°C</td>
-                <td>08.06.2022 22:19</td>
-              </tr>
-            </tbody>
+            <tbody id="tableBody"></tbody>
           </table>
 
           <button class="close--button" id="historyCloseButton">
-            <span>CLOSE </span>
+            <span>CLOSE </span>
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -107,7 +92,7 @@
 
     <footer class="footer">
       <a href="https://github.com/wittula"
-        ><i class="fab fa-github"></i> Patryk 'wittula' Wittbrodt</a
+        ><i class="fab fa-github"></i> Patryk 'wittula' Wittbrodt</a
       >
     </footer>
 

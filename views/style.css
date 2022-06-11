@@ -81,9 +81,10 @@ body {
   border-bottom: 3px solid rgb(177, 52, 52);
   border-right: 3px solid rgb(177, 52, 52);
 
-  color: #fff;
+  padding: 15px 30px;
+  margin-bottom: 20px;
 
-  padding: 10px;
+  color: #fff;
 }
 
 .errors ul {
@@ -369,5 +370,9 @@ button[type="submit"]:active {
     padding: 10px;
 
     padding-top: 40px;
+  }
+
+  .errors {
+    width: 290px;
   }
 }

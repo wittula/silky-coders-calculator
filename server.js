@@ -1,85 +1,137 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-
+const supabase = require("@supabase/supabase-js");
 const Celsius = require("./units/Celsius");
 const Fahrenheit = require("./units/Fahrenheit");
 const Kelvin = require("./units/Kelvin");
-
-const { check, validationResult } = require("express-validator");
+const cors = require("cors");
+const { check, body, validationResult } = require("express-validator");
 
 const app = express();
+app.use(bodyParser.json());
 
-app.set("view engine", "ejs");
+const supabaseConn = supabase.createClient(
+  "https://wiflelveeszmhaoknpuc.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZmxlbHZlZXN6bWhhb2tucHVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTQ4ODEyMzksImV4cCI6MTk3MDQ1NzIzOX0.rpJ6e1VXjh70mnNYK1ZKusO8w8gbSwp8wYw2mOk9riE"
+);
+app.use(cors());
+
+const sendRecord = async (input, output) => {
+  const { data: newRecord } = await supabaseConn
+    .from("calculator-history")
+    .insert({ input: input, output: output });
+
+  // console.log(newRecord);
+
+  return {
+    newRecord: newRecord,
+  };
+};
+
+const getHistory = async () => {
+  const { data: history } = await supabaseConn
+    .from("calculator-history")
+    .select("*")
+    .limit(20)
+    .order("id", { ascending: false });
+
+  // console.log(history);
+
+  return {
+    history: history,
+  };
+};
+
 app.use(express.static(__dirname + "/views"));
-const urlencodedParser = bodyParser.urlencoded({ extended: false });
-
-app.get("/", (req, res) => {
-  res.render("index");
+app.get("/api/history", (req, res) => {
+  getHistory().then((result) => {
+    res.status(200).json({
+      history: result,
+    });
+  });
 });
 
 app.post(
-  "/",
-  urlencodedParser,
+  "/api/calc",
   [
-    check("inputValue", "Value must be a number!").exists().isNumeric(),
-    check("tempTo", "Selected temperature units can't be the same!").custom(
-      (value, { req }) => value != req.body.tempFrom
-    ),
+    // Validation part
+    body("value").exists().isNumeric().isFloat({ min: -1000000, max: 1000000 }),
+    body("tempFrom").custom((value, { req }) => {
+      if (req.body.tempFrom == req.body.tempTo) {
+        throw new Error("Selected temperature units can't be the same!");
+      }
+      return true;
+    }),
   ],
   (req, res) => {
+    // console.log(req.body.value, req.body.tempFrom, req.body.tempTo);
+
     const errors = validationResult(req);
-
     if (!errors.isEmpty()) {
-      // return res.status(422).jsonp(errors.array());
-
-      const alert = errors.array();
-      res.render("index", {
-        alert,
-      });
-    } else {
-      const numberInput = Number(req.body.inputValue);
-
-      let temperatureInput;
-      let temperatureOutput;
-
-      switch (req.body.tempFrom) {
-        case "c":
-          temperatureInput = new Celsius(numberInput);
-          break;
-
-        case "f":
-          temperatureInput = new Fahrenheit(numberInput);
-          break;
-
-        case "k":
-          temperatureInput = new Kelvin(numberInput);
-          break;
-      }
-
-      switch (req.body.tempTo) {
-        case "c":
-          temperatureOutput = new Celsius(temperatureInput.toCelsius());
-          break;
-
-        case "f":
-          temperatureOutput = new Fahrenheit(temperatureInput.toFahrenheit());
-          break;
-
-        case "k":
-          temperatureOutput = new Kelvin(temperatureInput.toKelvin());
-          break;
-      }
-
-      const inputString = temperatureInput.toString();
-      const outputString = temperatureOutput.toString();
-
-      res.render("index", {
-        inputString,
-        outputString,
-      });
+      return res.status(400).json({ errors: errors.array() });
     }
+
+    // console.log(errors);
+
+    const numberInput = Number(req.body.value);
+
+    let temperatureInput;
+    let temperatureOutput;
+
+    switch (req.body.tempFrom) {
+      case "c":
+        temperatureInput = new Celsius(numberInput);
+        break;
+
+      case "f":
+        temperatureInput = new Fahrenheit(numberInput);
+        break;
+
+      case "k":
+        temperatureInput = new Kelvin(numberInput);
+        break;
+    }
+
+    switch (req.body.tempTo) {
+      case "c":
+        temperatureOutput = new Celsius(temperatureInput.toCelsius());
+        break;
+
+      case "f":
+        temperatureOutput = new Fahrenheit(temperatureInput.toFahrenheit());
+        break;
+
+      case "k":
+        temperatureOutput = new Kelvin(temperatureInput.toKelvin());
+        break;
+    }
+
+    const inputString = temperatureInput.toString();
+    const outputString = temperatureOutput.toString();
+
+    sendRecord(inputString, outputString);
+
+    getHistory().then((result) => {
+      res.status(200).json({
+        inputString: inputString,
+        outputString: outputString,
+        history: result,
+      });
+    });
   }
 );
 
-app.listen(process.env.PORT || 5000);
+app.get("/", function (req, res) {
+  res.sendFile(path.join(__dirname, "/views/index.html"));
+});
+
+app.use((err, req, res, next) => {
+  // console.log(err);
+  err.statusCode = err.statusCode || 500;
+  err.message = err.message || "Internal Server Error";
+  res.status(err.statusCode).json({
+    message: err.message,
+  });
+});
+
+app.listen(process.env.PORT || 8080);
