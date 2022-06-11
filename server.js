@@ -134,4 +134,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(process.env.PORT || 8080);
+app.listen(8080, function (err) {
+  if (err) console.log("Error in server setup");
+  console.log("Server listening on port", 8080);
+});
