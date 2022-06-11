@@ -6,6 +6,8 @@ Simple temperature calculator/converter app made in **NodeJS** with its own API 
 
 First, put all project files into one path, open terminal in that destination and type `npm install` to install all required packages. After installation run `npm start` or `npm run devStart` if you want to run this app by nodemon.
 
+After running, calculator app should be at http://localhost:8080
+
 ## How to run tests?
 
 While calculator app is running, open terminal in project path and type `npx cypress run`. 
