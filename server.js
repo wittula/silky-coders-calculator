@@ -20,7 +20,9 @@ const sendRecord = async (input, output) => {
   const { data: newRecord } = await supabaseConn
     .from("calculator-history")
     .insert({ input: input, output: output });
-  console.log(newRecord);
+
+  // console.log(newRecord);
+
   return {
     newRecord: newRecord,
   };
@@ -32,7 +34,9 @@ const getHistory = async () => {
     .select("*")
     .limit(20)
     .order("id", { ascending: false });
-  console.log(history);
+
+  // console.log(history);
+
   return {
     history: history,
   };
@@ -50,7 +54,8 @@ app.get("/api/history", (req, res) => {
 app.post(
   "/api/calc",
   [
-    body("value").exists().isNumeric(),
+    // Validation part
+    body("value").exists().isNumeric().isFloat({ min: -1000000, max: 1000000 }),
     body("tempFrom").custom((value, { req }) => {
       if (req.body.tempFrom == req.body.tempTo) {
         throw new Error("Selected temperature units can't be the same!");
@@ -59,12 +64,14 @@ app.post(
     }),
   ],
   (req, res) => {
-    console.log(req.body.value, req.body.tempFrom, req.body.tempTo);
+    // console.log(req.body.value, req.body.tempFrom, req.body.tempTo);
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    console.log(errors);
+
+    // console.log(errors);
 
     const numberInput = Number(req.body.value);
 
@@ -101,7 +108,9 @@ app.post(
 
     const inputString = temperatureInput.toString();
     const outputString = temperatureOutput.toString();
+
     sendRecord(inputString, outputString);
+
     getHistory().then((result) => {
       res.status(200).json({
         inputString: inputString,
@@ -117,7 +126,7 @@ app.get("/", function (req, res) {
 });
 
 app.use((err, req, res, next) => {
-  console.log(err);
+  // console.log(err);
   err.statusCode = err.statusCode || 500;
   err.message = err.message || "Internal Server Error";
   res.status(err.statusCode).json({
@@ -125,4 +134,4 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(process.env.PORT || 5000);
+app.listen(process.env.PORT || 8080);
